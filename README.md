@@ -3,7 +3,10 @@
 This repository contains Gradio app for locally running the Conversational Speech Model (CSM) with support for both CUDA, MLX (Apple Silicon) and CPU backends.
 
 ## Sample CSM audio
-![CSM Sample Audio](assets/audio.wav)
+<audio controls>
+  <source src="assets/audio.wav" type="audio/wav">
+  Your browser does not support the audio element.
+</audio>
 
 ## UI Screenshots:
 ![Gradio UI](assets/gradio-demo.jpg)
