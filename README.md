@@ -90,12 +90,109 @@ The scripts support three backends:
    - Works on all platforms
    - Uses PyTorch implementation
 
+CSM API Documentation
+
+Getting Started
+--------------
+Run the API server using:
+python serve_api.py
+
+API Endpoints
+------------
+
+1. Text-to-Speech Generation
+   Endpoint: POST /v1/audio/speech
+   
+   Generate speech from text using the specified voice.
+   
+   Request Body:
+   {
+       "model": "csm-1b",
+       "input": "Text to convert to speech",
+       "voice": "speaker_0",
+       "response_format": "audio/wav"
+   }
+   
+   Response:
+   {
+       "content_type": "audio/wav",
+       "audio": "base64_encoded_audio_data"
+   }
+
+2. Voice Cloning
+   Endpoint: POST /v1/audio/speech/clone
+   
+   Clone a new voice from an audio sample.
+   
+   Request Body:
+   {
+       "audio_data": "base64_encoded_audio_file",
+       "response_format": "audio/wav"
+   }
+   
+   Response:
+   {
+       "voice_id": "speaker_1",
+       "status": "success"
+   }
+
+Python Client Example
+-------------------
+from openai import OpenAI
+import base64
+
+# Initialize client
+client = OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="dummy"
+)
+
+# Generate speech
+response = client.audio.speech.create(
+    model="csm-1b",
+    voice="speaker_0",
+    input="Hello, this is a test!"
+)
+response.stream_to_file("output.wav")
+
+# Clone a voice
+with open("voice_sample.wav", "rb") as audio_file:
+    audio_data = base64.b64encode(audio_file.read()).decode()
+    
+response = client.post(
+    "audio/speech/clone",
+    json={
+        "audio_data": audio_data
+    }
+)
+new_voice_id = response.json()["voice_id"]
+
+# Use the cloned voice
+response = client.audio.speech.create(
+    model="csm-1b",
+    voice=new_voice_id,
+    input="Hello with the cloned voice!"
+)
+response.stream_to_file("cloned_output.wav")
+
+Notes
+-----
+- Server automatically selects appropriate backend (CUDA/MPS/CPU)
+- All audio is returned in WAV format
+- Voice IDs are in the format speaker_N where N is an integer
+- API is compatible with OpenAI's TTS API
+
 ## Requirements
 
 - Python 3.10+
 - PyTorch
 - MLX (for Apple Silicon)
 - Gradio
+- torchaudio
+- litserve
+- fastapi
+- uvicorn
+- pydantic
 - Other dependencies listed in requirements.txt
 
 ## Credits
@@ -104,6 +201,7 @@ The scripts support three backends:
 - MLX port by [senstella](https://github.com/senstella/csm-mlx)
 
 # CSM
+**2025/03/25** - I am releasing support for API endpoints.
 
 **2025/03/20** - I am releasing support for Apple MLX for Mac device. The UI will auto select the backend from CUDA, MPS or CPU. The MLX code is an adaptation from [Senstella/csm-mlx](https://github.com/senstella/csm-mlx)
 

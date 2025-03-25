@@ -26,6 +26,12 @@ soundfile
 # Add this line
 psutil  # For CPU memory tracking
 
+# New dependencies
+litserve>=0.1.0
+fastapi>=0.68.0
+uvicorn>=0.15.0
+pydantic>=1.8.0
+
 # MLX dependencies (automatically installed only on Apple Silicon)
 mlx>=0.22.1; platform_system == "Darwin" and platform_machine == "arm64"
 mlx-lm>=0.22.0; platform_system == "Darwin" and platform_machine == "arm64"

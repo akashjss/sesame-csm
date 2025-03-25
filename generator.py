@@ -162,6 +162,30 @@ class Generator:
 
         return audio
 
+    def clone_voice(self, audio_tensor: torch.Tensor) -> int:
+        """
+        Creates a new speaker embedding from the provided audio sample.
+        
+        Args:
+            audio_tensor: The audio sample to create the embedding from
+            
+        Returns:
+            speaker_id: The ID of the new cloned voice
+        """
+        # Process the audio through the model's speaker encoder
+        with torch.no_grad():
+            # Normalize audio
+            audio_tensor = audio_tensor.to(self.device)
+            
+            # Extract speaker embedding using the model's speaker encoder
+            speaker_embedding = self._model.get_speaker_embedding(audio_tensor)
+            
+            # Add the new embedding to the model's speaker bank
+            new_speaker_id = len(self._model.speaker_embeddings)
+            self._model.speaker_embeddings[new_speaker_id] = speaker_embedding
+            
+            return new_speaker_id
+
 
 def load_csm_1b(device: str = "cuda") -> Generator:
     model = Model.from_pretrained("sesame/csm-1b")
